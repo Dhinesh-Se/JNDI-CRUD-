@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Enable component scanning -->
+    <context:component-scan base-package="com.kgisl.jndicrud.controller" />
+
+    <!-- Define JNDI template -->
+    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <prop key="java.naming.factory.initial">com.mysql.cj.jdbc.MysqlInitialContextFactory</prop>
+                <prop key="java.naming.factory.url.pkgs">com.mysql.cj.jdbc</prop>
+                <prop key="java.naming.provider.url">jdbc:mysql://localhost:3306/demo?user=root&amp;password=</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" /> 
+    </bean>
+
+
+    <!-- Define JNDI DataSource -->
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref="jndiTemplate" />
+        <property name="jndiName" value="java:comp/env/jdbc/MyDB" />
+    </bean>
+
+    <!-- Configure JDBC Template -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- Define DAO bean -->
+    <bean id="employeeDAO" class="com.kgisl.jndicrud.dao.EmployeeDAO">
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+</beans>
